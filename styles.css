@@ -1,0 +1,518 @@
+/* ---------- THEME VARIABLES ---------- */
+body.navy {
+  --bg-main: linear-gradient(180deg, #06131d, #02070b);
+  --grid-bg: linear-gradient(120deg, #0a3a4d, #0f5e73, #0a3a4d);
+  --ship: #7b848a;
+
+  --terminal-bg: rgba(5, 20, 30, 0.85);
+  --terminal-border: rgba(0, 200, 255, 0.55);
+  --terminal-text: #8fd3ff;
+}
+
+body.sonar {
+  --bg-main: radial-gradient(circle at center, #003300, #000);
+  --grid-bg: repeating-linear-gradient(
+    0deg,
+    #003300,
+    #003300 10px,
+    #002200 10px,
+    #002200 20px
+  );
+  --ship: #66ff66;
+
+  --terminal-bg: rgba(0, 30, 0, 0.85);
+  --terminal-border: #00ff66;
+  --terminal-text: #66ff99;
+}
+
+body.neon {
+  --bg-main: linear-gradient(180deg, #0f0020, #000);
+  --grid-bg: linear-gradient(120deg, #ff00ff, #00ffff, #ff00ff);
+  --ship: #00ffff;
+
+  --terminal-bg: rgba(20, 0, 30, 0.85);
+  --terminal-border: #ff00ff;
+  --terminal-text: #ff77ff;
+}
+
+/* ---------- BASE ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-main);
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: #e6f1f5;
+}
+
+header { width: 100%; position: relative; }
+
+#settings-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #e6f1f5;
+  font-size: 1.6rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+#header-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+header h1 {
+  font-size: 4rem;
+  margin: 20px 0 10px;
+  letter-spacing: 6px;
+  text-shadow: 0 4px 20px rgba(0, 200, 255, 0.35);
+  text-align: center;
+}
+
+/* ---------- TITLE INTRO ANIMATION ---------- */
+header h1 {
+  animation: titleIntro 1.2s ease-out forwards;
+}
+
+@keyframes titleIntro {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    filter: blur(6px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* ---------- HUD (STAR FOX STYLE) ---------- */
+#hud {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+
+  width: 100%;
+  max-width: 900px;
+  margin: 8px auto 0;
+}
+
+#commander {
+  width: 150px;
+  height: 150px;
+  image-rendering: pixelated;
+  background: #000;
+  border: 3px solid var(--terminal-border);
+  border-radius: 10px;
+  box-shadow: 0 0 20px var(--terminal-border);
+}
+
+#terminal {
+  width: 540px;
+  min-height: 110px;
+  padding: 18px 22px;
+
+  background: var(--terminal-bg);
+  border: 2px solid var(--terminal-border);
+  border-radius: 10px;
+
+  font-family: "Courier New", monospace;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--terminal-text);
+
+  text-align: left;
+  box-shadow: inset 0 0 20px var(--terminal-border);
+}
+
+.cursor { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- MAIN LAYOUT LOCK ---------- */
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+  padding: 10px 16px 40px;
+}
+
+/* ---------- SETUP ---------- */
+#setup-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 14px 0 10px;
+}
+
+#setup-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--terminal-border);
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 200, 255, 0.25);
+}
+
+#setup-box input,
+#setup-box select {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.35);
+  color: #e6f1f5;
+  outline: none;
+}
+
+#setup-box button {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: #e6f1f5;
+  background: linear-gradient(145deg, #2c3e50, #1b2a36);
+  letter-spacing: 1px;
+}
+
+#hint {
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+/* ---------- TURN ---------- */
+#turn {
+  margin: 10px 0 6px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: #2ecc71;
+  color: #0b1216;
+}
+.hidden { display: none; }
+
+/* ---------- BOARDS ---------- */
+.boards {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board h2 {
+  margin: 10px 0 14px;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  grid-template-rows: repeat(10, 50px);
+  gap: 6px;
+  padding: 16px;
+
+  background: var(--grid-bg);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+}
+
+.disabled { pointer-events: none; opacity: 0.5; }
+
+.ship { background: linear-gradient(145deg, #7b848a, #3d4347); }
+.preview { outline: 2px dashed rgba(255,255,255,0.8); }
+.hit { background: linear-gradient(145deg, #2ecc71, #1e8449); }
+.miss { background: linear-gradient(145deg, #e74c3c, #922b21); }
+
+/* ---------- CONTROLS ---------- */
+.controls {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.controls button {
+  min-width: 190px;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+  color: #eaf6ff;
+  background: linear-gradient(145deg, #2c3e50, #1b2a36);
+}
+
+.controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- MODALS ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.85);
+  z-index: 2000;
+}
+
+.modal.show { display: flex; }
+
+.modal-inner {
+  width: min(520px, 92vw);
+  padding: 18px 18px 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+.modal-inner h3 { margin: 0 0 12px; }
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.row input[type="range"] { width: 240px; }
+
+.row.buttons { justify-content: center; }
+
+.row.buttons button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: #eaf6ff;
+  background: linear-gradient(145deg, #2c3e50, #1b2a36);
+}
+
+/* End screen commander */
+#winner-commander {
+  width: 180px;
+  height: 180px;
+  image-rendering: pixelated;
+  border: 4px solid var(--terminal-border);
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 0 25px var(--terminal-border);
+  margin-bottom: 14px;
+}
+
+#stats {
+  margin: 14px auto 10px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-family: "Courier New", monospace;
+  text-align: left;
+  line-height: 1.6;
+}
+
+
+/* ---------- COMMANDER THEME COLOR TINTS ---------- */
+
+/* NAVY — normal */
+body.navy #commander {
+  filter: none;
+}
+
+/* SONAR — submarine phosphor green */
+body.sonar #commander {
+  filter:
+    saturate(1.5)
+    brightness(1.05)
+    contrast(1.1);
+}
+
+/* NEON — cyberpunk arcade */
+body.neon #commander {
+  filter:
+    saturate(1.8)
+    contrast(1.25)
+    brightness(1.1)
+    drop-shadow(0 0 6px rgba(255, 0, 255, 0.7))
+    drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+}
+
+/* ---------- GRID WATER / THEME ANIMATION EFFECT ---------- */
+
+.grid {
+  position: relative; /* required for overlay */
+}
+
+.grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.12)
+  );
+
+  background-size: 400% 400%;
+  border-radius: inherit;
+}
+
+/* ⚓ NAVY — slow ocean swell */
+body.navy .grid::after {
+  animation: swellDrift 16s ease-in-out infinite;
+  opacity: 0.3;
+}
+
+@keyframes swellDrift {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 200% 55%; }
+  100% { background-position: 400% 50%; }
+}
+
+/* 🟢 SONAR — ping pulse */
+body.sonar .grid::after {
+  animation: pingPulse 3.5s ease-in-out infinite alternate;
+  opacity: 0.45;
+}
+
+@keyframes pingPulse {
+  from { opacity: 0.18; }
+  to   { opacity: 0.55; }
+}
+
+/* 🟣 NEON — SCANLINE DRIFT (ARCade / CRT) */
+body.neon .grid::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 255, 255, 0.15),
+    rgba(0, 255, 255, 0.15) 2px,
+    transparent 6px
+  );
+  background-size: 100% 10px;
+  animation: dataRain 5s linear infinite;
+  opacity: 0.35;
+}
+
+@keyframes dataRain {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100%; }
+}
+
+/* ---------- GLOBAL SCANLINE EFFECT (COMMANDER + TERMINAL) ---------- */
+
+/* shared scanline overlay */
+#commander::after,
+#terminal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.08) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+
+  background-size: 100% 6px;
+  animation: scanlineDrift 8s linear infinite;
+  border-radius: inherit;
+  opacity: 0.2;
+}
+
+/* ensure positioning context */
+#commander,
+#terminal {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- THEME TUNING ---------- */
+
+/* ⚓ NAVY — subtle CRT */
+body.navy #commander::after,
+body.navy #terminal::after {
+  opacity: 0.15;
+  animation-duration: 10s;
+}
+
+/* 🟢 SONAR — stronger tactical scan */
+body.sonar #commander::after,
+body.sonar #terminal::after {
+  opacity: 0.35;
+  animation-duration: 6s;
+}
+
+/* 🟣 NEON — obvious arcade scanlines */
+body.neon #commander::after,
+body.neon #terminal::after {
+  opacity: 0.45;
+  animation-duration: 4s;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 0, 255, 0.3),
+    rgba(255, 0, 255, 0.3) 1px,
+    rgba(0, 255, 255, 0.2) 2px,
+    transparent 4px
+  );
+}
+
+/* ---------- SCANLINE ANIMATION ---------- */
+
+@keyframes scanlineDrift {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100%; }
+}

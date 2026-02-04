@@ -63,6 +63,7 @@ const sounds = {
 muteEnemyBtn.onclick = () => {
   muteEnemy = !muteEnemy;
   muteEnemyBtn.textContent = muteEnemy ? "Unmute Enemy SFX" : "Mute Enemy SFX";
+  localStorage.setItem("shipSinkersMuteEnemy", muteEnemy);
 };
 
 function playSound(name, isEnemy = false) {
@@ -80,6 +81,25 @@ if (savedTheme) {
   document.body.classList.remove("navy", "sonar", "neon");
   document.body.classList.add(savedTheme);
   themeSelect.value = savedTheme;
+}
+
+// ---------- LOAD SAVED USERNAME ----------
+const savedUsername = localStorage.getItem("shipSinkersUsername");
+if (savedUsername) {
+  usernameInput.value = savedUsername;
+}
+
+// ---------- LOAD SAVED AUDIO SETTINGS ----------
+const savedMuted = localStorage.getItem("shipSinkersMuted");
+if (savedMuted !== null) {
+  muted = savedMuted === "true";
+  muteBtn.textContent = muted ? "Unmute" : "Mute";
+}
+
+const savedMuteEnemy = localStorage.getItem("shipSinkersMuteEnemy");
+if (savedMuteEnemy !== null) {
+  muteEnemy = savedMuteEnemy === "true";
+  muteEnemyBtn.textContent = muteEnemy ? "Unmute Enemy SFX" : "Mute Enemy SFX";
 }
 
 
@@ -101,6 +121,7 @@ volumeSlider.oninput = (e) => (volume = Number(e.target.value) / 100);
 muteBtn.onclick = () => {
   muted = !muted;
   muteBtn.textContent = muted ? "Unmute" : "Mute";
+  localStorage.setItem("shipSinkersMuted", muted);
 };
 
 /* ---------- GAME STATE ---------- */
@@ -256,6 +277,7 @@ confirmSetup.onclick = () => {
   audioReady = true;
 
   username = u;
+  localStorage.setItem("shipSinkersUsername", username);
   difficulty = d;
 
   placing = true;

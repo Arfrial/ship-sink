@@ -30,6 +30,7 @@ const commander = document.getElementById("commander");
 /* ---------- AI MEMORY ---------- */
 let huntQueue = [];
 let huntHits = [];
+let huntOrientation = null; 
 
 function getNeighbors(idx) {
   const neighbors = [];
@@ -373,25 +374,25 @@ function fireAtEnemy(e) {
   setTimeout(enemyTurn, 650);
 }
 
-/* ---------- ENEMY AI (v1 = random; difficulty will expand later) ---------- */
+/* ---------- ENEMY AI ---------- */
 function pickEnemyShot() {
 
-  // IMPOSSIBLE — cheat (unchanged idea)
+  // IMPOSSIBLE — cheat
   if (difficulty === "impossible") {
     return Number(playerShips.flat()[0]);
   }
 
-  // HARD & MEDIUM — hunt mode
-  if ((difficulty === "medium" || difficulty === "hard") && huntQueue.length > 0) {
-    let shot;
-    do {
-      shot = huntQueue.shift();
-    } while (enemyShots.has(shot) && huntQueue.length);
-
-    if (!enemyShots.has(shot)) return shot;
+  // MEDIUM & HARD — MUST exhaust huntQueue first
+  if ((difficulty === "medium" || difficulty === "hard")) {
+    while (huntQueue.length > 0) {
+      const next = huntQueue.shift();
+      if (!enemyShots.has(next)) {
+        return next;
+      }
+    }
   }
 
-  // EASY / fallback — random
+  // EASY or fallback — random
   let shot;
   do {
     shot = Math.floor(Math.random() * 100);
@@ -399,6 +400,7 @@ function pickEnemyShot() {
 
   return shot;
 }
+
 
 /* ---------- ENEMY TURN ---------- */
 function enemyTurn() {
@@ -416,30 +418,81 @@ function enemyTurn() {
     cell.classList.add("hit");
     playSound("hit", true);
 
+    // Remove this hit from the ship
     ship.splice(ship.indexOf(String(shot)), 1);
 
-    // ---------- HUNT MODE MEMORY ----------
+    // If we're not currently hunting anything, start a new target
+    if (huntHits.length === 0) {
+      huntOrientation = null;
+      huntQueue = [];
+    }
+
+    // Record hit for current target
+    huntHits.push(shot);
+
+    // MEDIUM/HARD: add neighbors to queue
     if (difficulty === "medium" || difficulty === "hard") {
       getNeighbors(shot).forEach(n => {
         if (!enemyShots.has(n) && !huntQueue.includes(n)) {
           huntQueue.push(n);
         }
       });
+    }
 
-      huntHits.push(shot);
-
-      // HARD MODE: direction lock after 2 hits
-      if (difficulty === "hard" && huntHits.length >= 2) {
-        const a = huntHits[huntHits.length - 2];
-        const b = huntHits[huntHits.length - 1];
-        const diff = b - a;
-
-        huntQueue = huntQueue.filter(n => {
-          if (diff === 1) return Math.abs(n - b) === 1;
-          if (diff === 10) return Math.abs(n - b) === 10;
-          return true;
-        });
+    // HARD: detect orientation once we have 2 hits
+    if (difficulty === "hard" && huntHits.length >= 2 && !huntOrientation) {
+      // Find any pair that defines an axis (not just last two)
+      for (let i = 0; i < huntHits.length; i++) {
+        for (let j = i + 1; j < huntHits.length; j++) {
+          const a = huntHits[i], b = huntHits[j];
+          if (Math.abs(a - b) === 1 && Math.floor(a / 10) === Math.floor(b / 10)) {
+            huntOrientation = "horizontal";
+          }
+          if (Math.abs(a - b) === 10) {
+            huntOrientation = "vertical";
+          }
+          if (huntOrientation) break;
+        }
+        if (huntOrientation) break;
       }
+    }
+
+    // HARD: extend along the ship ends only
+    if (difficulty === "hard" && huntOrientation) {
+      huntQueue = [];
+
+      const sorted = [...huntHits].sort((x, y) => x - y);
+
+      if (huntOrientation === "horizontal") {
+        // Keep only hits in the same row as the first hit
+        const row = Math.floor(sorted[0] / 10);
+        const rowHits = sorted.filter(h => Math.floor(h / 10) === row).sort((a, b) => a - b);
+
+        const left = rowHits[0] - 1;
+        const right = rowHits[rowHits.length - 1] + 1;
+
+        if (left >= 0 && Math.floor(left / 10) === row && !enemyShots.has(left)) huntQueue.push(left);
+        if (right < 100 && Math.floor(right / 10) === row && !enemyShots.has(right)) huntQueue.push(right);
+      }
+
+      if (huntOrientation === "vertical") {
+        const col = sorted[0] % 10;
+        const colHits = sorted.filter(h => (h % 10) === col).sort((a, b) => a - b);
+
+        const top = colHits[0] - 10;
+        const bottom = colHits[colHits.length - 1] + 10;
+
+        if (top >= 0 && !enemyShots.has(top)) huntQueue.push(top);
+        if (bottom < 100 && !enemyShots.has(bottom)) huntQueue.push(bottom);
+      }
+    }
+
+    // ✅ TRUE sunk condition in your data structure:
+    // when that ship array becomes empty, it's sunk
+    if (ship.length === 0) {
+      huntQueue = [];
+      huntHits = [];
+      huntOrientation = null;
     }
 
   } else {
@@ -447,21 +500,10 @@ function enemyTurn() {
     playSound("miss", true);
   }
 
-  // ---------- CHECK PLAYER LOSS ----------
+  // Player loses?
   if (playerShips.every(s => s.length === 0)) {
     endGame(false);
     return;
-  }
-
-  // ---------- RESET HUNT IF SHIP SUNK ----------
-  if (
-    huntHits.length &&
-    !playerShips.some(s =>
-      s.length > 0 && huntHits.some(h => s.includes(String(h)))
-    )
-  ) {
-    huntQueue = [];
-    huntHits = [];
   }
 
   playerTurn = true;

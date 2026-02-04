@@ -5,7 +5,7 @@ A locally hosted Battleship-esque game built with vanilla HTML, CSS, and JavaScr
 ## Features ##
 - Classic battleship gameplay on a 10x10 grid
 - Multiple visual styles (Navy, Sonar, Neon)
-- Visually appealing UI, Terminal-style feedback, Animated grid effects
+- Visually appealing UI, Terminal-style feedback, Animated grid effects, stats after match.
 - Difficulty-based AI with hunt logic.
 
 ## How To Run Locally ##

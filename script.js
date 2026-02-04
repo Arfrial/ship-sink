@@ -527,7 +527,7 @@ function endGame(playerWon) {
     typeStatus("Enemy fleet destroyed. Victory!");
     playSound("win");
   } else {
-    winnerCommander.src = "commander/lose.png";
+    winnerCommander.src = "commander/lose_V2.png";
     setCommander("lose");
     winnerText.textContent = `Defeat, Captain ${username}…`;
     typeStatus("Our fleet has been sunk...");

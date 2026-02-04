@@ -9,7 +9,7 @@ A locally hosted Battleship-esque game built with vanilla HTML, CSS, and JavaScr
 - Difficulty-based AI with hunt logic.
 
 ## How To Run Locally ##
-1. Place the project folder directly inside your XAMPP 'htdocs' directory
+1. Place the project folder directly inside your XAMPP 'htdocs' directory (C:Disk < xampp < htdocs)
 2. Start Apache from the XAMPP control panel
 3. Open a browser and navigate to: http://localhost/ship-sink/
 4. Play!

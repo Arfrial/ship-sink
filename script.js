@@ -17,6 +17,7 @@ const closeSettings = document.getElementById("close-settings");
 const themeSelect = document.getElementById("theme-select");
 const volumeSlider = document.getElementById("volume-slider");
 const muteBtn = document.getElementById("mute-btn");
+const muteEnemyBtn = document.getElementById("mute-enemy-btn");
 
 const winnerModal = document.getElementById("winner");
 const winnerText = document.getElementById("winner-text");
@@ -49,17 +50,25 @@ function setCommander(state) {
 let audioReady = false;
 let volume = 0.7;
 let muted = false;
+let muteEnemy = false; 
 
 const sounds = {
   hit: new Audio("sounds/hit.mp3"),
-  miss: new Audio("sounds/miss.mp3"),
-  place: new Audio("sounds/place.mp3"),
+  miss: new Audio("sounds/miss_V2.mp3"),
+  place: new Audio("sounds/place_V3.mp3"),
   win: new Audio("sounds/win.mp3"),
   lose: new Audio("sounds/lose.mp3"),
 };
 
-function playSound(name) {
+muteEnemyBtn.onclick = () => {
+  muteEnemy = !muteEnemy;
+  muteEnemyBtn.textContent = muteEnemy ? "Unmute Enemy SFX" : "Mute Enemy SFX";
+};
+
+function playSound(name, isEnemy = false) {
   if (!audioReady || muted) return;
+  if (isEnemy && muteEnemy) return;
+
   const s = sounds[name].cloneNode();
   s.volume = volume;
   s.play();
@@ -300,14 +309,14 @@ function fireAtEnemy(e) {
   const ship = enemyShips.find((s) => s.includes(idx));
   if (ship) {
     cell.classList.add("hit");
-    playSound("hit");
+    playSound("hit",);
     setCommander("hit");
     typeStatus("HIT!");
     playerHits++;
     ship.splice(ship.indexOf(idx), 1);
   } else {
     cell.classList.add("miss");
-    playSound("miss");
+    playSound("miss",);
     setCommander("miss");
     typeStatus("MISS...");
   }
@@ -349,11 +358,11 @@ function enemyTurn() {
 
   if (ship) {
     cell.classList.add("hit");
-    playSound("hit");
+    playSound("hit", true);
     ship.splice(ship.indexOf(String(shot)), 1);
   } else {
     cell.classList.add("miss");
-    playSound("miss");
+    playSound("miss", true);
   }
 
   // enemy win?

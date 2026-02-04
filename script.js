@@ -27,6 +27,23 @@ const winnerCommander = document.getElementById("winner-commander");
 
 const commander = document.getElementById("commander");
 
+/* ---------- AI MEMORY ---------- */
+let huntQueue = [];
+let huntHits = [];
+
+function getNeighbors(idx) {
+  const neighbors = [];
+  const row = Math.floor(idx / 10);
+  const col = idx % 10;
+
+  if (col > 0) neighbors.push(idx - 1);
+  if (col < 9) neighbors.push(idx + 1);
+  if (row > 0) neighbors.push(idx - 10);
+  if (row < 9) neighbors.push(idx + 10);
+
+  return neighbors;
+}
+
 /* ---------- TERMINAL TYPING ---------- */
 let typingTimeout;
 function typeStatus(text, speed = 28) {
@@ -358,11 +375,28 @@ function fireAtEnemy(e) {
 
 /* ---------- ENEMY AI (v1 = random; difficulty will expand later) ---------- */
 function pickEnemyShot() {
-  // v1: random for all difficulties (we'll upgrade next)
+
+  // IMPOSSIBLE — cheat (unchanged idea)
+  if (difficulty === "impossible") {
+    return Number(playerShips.flat()[0]);
+  }
+
+  // HARD & MEDIUM — hunt mode
+  if ((difficulty === "medium" || difficulty === "hard") && huntQueue.length > 0) {
+    let shot;
+    do {
+      shot = huntQueue.shift();
+    } while (enemyShots.has(shot) && huntQueue.length);
+
+    if (!enemyShots.has(shot)) return shot;
+  }
+
+  // EASY / fallback — random
   let shot;
   do {
     shot = Math.floor(Math.random() * 100);
   } while (enemyShots.has(shot));
+
   return shot;
 }
 
@@ -376,27 +410,65 @@ function enemyTurn() {
   enemyShots.add(shot);
 
   const cell = playerGrid.children[shot];
-  const ship = playerShips.find((s) => s.includes(String(shot)));
+  const ship = playerShips.find(s => s.includes(String(shot)));
 
   if (ship) {
     cell.classList.add("hit");
     playSound("hit", true);
+
     ship.splice(ship.indexOf(String(shot)), 1);
+
+    // ---------- HUNT MODE MEMORY ----------
+    if (difficulty === "medium" || difficulty === "hard") {
+      getNeighbors(shot).forEach(n => {
+        if (!enemyShots.has(n) && !huntQueue.includes(n)) {
+          huntQueue.push(n);
+        }
+      });
+
+      huntHits.push(shot);
+
+      // HARD MODE: direction lock after 2 hits
+      if (difficulty === "hard" && huntHits.length >= 2) {
+        const a = huntHits[huntHits.length - 2];
+        const b = huntHits[huntHits.length - 1];
+        const diff = b - a;
+
+        huntQueue = huntQueue.filter(n => {
+          if (diff === 1) return Math.abs(n - b) === 1;
+          if (diff === 10) return Math.abs(n - b) === 10;
+          return true;
+        });
+      }
+    }
+
   } else {
     cell.classList.add("miss");
     playSound("miss", true);
   }
 
-  // enemy win?
-  if (playerShips.every((s) => s.length === 0)) {
+  // ---------- CHECK PLAYER LOSS ----------
+  if (playerShips.every(s => s.length === 0)) {
     endGame(false);
     return;
+  }
+
+  // ---------- RESET HUNT IF SHIP SUNK ----------
+  if (
+    huntHits.length &&
+    !playerShips.some(s =>
+      s.length > 0 && huntHits.some(h => s.includes(String(h)))
+    )
+  ) {
+    huntQueue = [];
+    huntHits = [];
   }
 
   playerTurn = true;
   turnText.textContent = "YOUR TURN";
   typeStatus("Your move, Captain.");
 }
+
 
 /* ---------- END GAME + STATS ---------- */
 function endGame(playerWon) {

@@ -73,7 +73,7 @@ let muteEnemy = false;
 const sounds = {
   hit: new Audio("sounds/hit.mp3"),
   miss: new Audio("sounds/miss_V2.mp3"),
-  place: new Audio("sounds/place_V3.mp3"),
+  place: new Audio("sounds/place_v3.mp3"),
   win: new Audio("sounds/win.mp3"),
   lose: new Audio("sounds/lose.mp3"),
 };
